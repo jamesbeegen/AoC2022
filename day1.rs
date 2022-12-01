@@ -32,7 +32,7 @@ fn main() {
                         largest_cals2 = temp_sum;
                     }
                     else if temp_sum > largest_cals3 {
-                        largest_cals3 = temp_sum
+                        largest_cals3 = temp_sum;
                     }
                     temp_sum = 0;
                 }
