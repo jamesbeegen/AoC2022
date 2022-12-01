@@ -2,8 +2,8 @@
 name = "day1"
 version = "0.1.0"
 edition = "2021"
-authors = "James Beegen"
+authors = ["James Beegen"]
 
 [lib]
-path = src/main.rs
+path = "src/main.rs"
 
