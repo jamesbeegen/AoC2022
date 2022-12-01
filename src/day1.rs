@@ -10,9 +10,9 @@ where P: AsRef<Path>, {
 }
 
 fn main() {
-    let mut current_elf = 1;
-    let mut largest_elf = 1;
-    let mut largest_cals = 0;
+    let mut largest_cals1 = 0;
+    let mut largest_cals2 = 0;
+    let mut largest_cals3 = 0;
     let mut temp_sum = 0;
 
     if let Ok(lines) = read_lines("./puzzle_input/day1-input.txt") {
@@ -22,15 +22,26 @@ fn main() {
                     temp_sum += cal.parse::<i32>().unwrap();
                 }
                 else {
-                    if temp_sum > largest_cals {
-                        largest_cals = temp_sum;
-                        largest_elf = current_elf;
+                    if temp_sum > largest_cals1 {
+                        largest_cals3 = largest_cals2;
+                        largest_cals2 = largest_cals1;
+                        largest_cals1 = temp_sum;
                     }
-                    current_elf += 1;
+                    else if temp_sum > largest_cals2 {
+                        largest_cals3 = largest_cals2;
+                        largest_cals2 = temp_sum;
+                    }
+                    else if temp_sum > largest_cals3 {
+                        largest_cals3 = temp_sum
+                    }
                     temp_sum = 0;
                 }
             }
         }
     }
-    println!("Elf #{} is carrying the most calories: {}", largest_elf, largest_cals);
+    // Part 1
+    println!("The most calories carried by an elf is {}", largest_cals1);
+
+    // Part 2
+    println!("The total number of carried by the top three elves is {} calories", largest_cals1 + largest_cals2 + largest_cals3);
 }
