@@ -17,7 +17,7 @@ fn main() {
 
     if let Ok(lines) = read_lines("./puzzle_input/day1-input.txt") {
         for line in lines {
-            if let Ok(cal) = line{
+            if let Ok(cal) = line {
                 if cal != "" {
                     temp_sum += cal.parse::<i32>().unwrap();
                 }
