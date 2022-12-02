@@ -15,7 +15,7 @@ fn main() {
     let mut largest_cals3 = 0;
     let mut temp_sum = 0;
 
-    if let Ok(lines) = read_lines("input.txt") {
+    if let Ok(lines) = read_lines("src/input.txt") {
         for line in lines {
             if let Ok(cal) = line {
                 if cal != "" {
