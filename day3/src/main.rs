@@ -1,4 +1,4 @@
-#![allow(dead_code,)]
+#![allow(dead_code, unused_mut)]
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -11,6 +11,7 @@ where P: AsRef<Path>, {
     Ok(io::BufReader::new(file).lines())
 }
 
+// Creates character to value mapping
 fn setup_value_table(hm: &mut HashMap<char, String>) {
     let letters = vec!('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
     for x in 1..53{
@@ -19,6 +20,7 @@ fn setup_value_table(hm: &mut HashMap<char, String>) {
     }
 }
 
+// For part 1 - gets the item found in both halfs of the rucksack
 fn get_priority_item(line: String) -> char {
     let mut first_half: Vec<char> = Vec::new();
     let mut second_half: Vec<char> = Vec::new();
@@ -35,6 +37,7 @@ fn get_priority_item(line: String) -> char {
         }
         i += 1;
     }
+
     for x in 0..first_half.len() {
         for j in 0..second_half.len(){
             if first_half[x] == second_half[j]{
@@ -46,54 +49,61 @@ fn get_priority_item(line: String) -> char {
     return matching_char;
 }
 
+// Does all of part 2
 fn part2(sacks: &mut Vec<String>, value_table: &mut HashMap<char, String>) -> i32 {
     let mut current_sacks: Vec<String> = Vec::new();
     let mut sack1_letters: Vec<char> = Vec::new();
     let mut sack2_letters: Vec<char> = Vec::new();
     let mut sack3_letters: Vec<char> = Vec::new();
     let mut total = 0;
-    let mut j = 0;
+    let mut group = 1;
+    let mut prev = 0;
 
-    for x in 0..sacks.len() {
-        if j == 3 {
+    for x in 0..sacks.len() + 1 {
+        if x + 3 == prev + 6 || x == 3{
+            prev = x;
+
             for char in current_sacks[0].chars() {
                 sack1_letters.push(char);
             }
+
             for char in current_sacks[1].chars() {
                 sack2_letters.push(char);
             }
+
             for char in current_sacks[2].chars() {
                 sack3_letters.push(char);
             }
             
             for char in &sack1_letters {
-                
-                if sack2_letters.contains(char) {
-                    if sack3_letters.contains(char) {
-                        total += value_table.get(& char).unwrap().parse::<i32>().unwrap();
-                        println!("{}", value_table.get(char).unwrap().parse::<i32>().unwrap());
-                    }
+                if sack2_letters.contains(&char) && sack3_letters.contains(&char) {
+                    total += value_table.get(& char).unwrap().parse::<i32>().unwrap();
+                    println!("Elf group {}:\nMatch: {}\nValue: {}", group, char, value_table.get(& char).unwrap().parse::<i32>().unwrap());
+                    break;
                 }
             }
 
-            j = 0;
-            let mut current_sacks: Vec<String> = Vec::new();
-            let mut sack1_letters: Vec<char> = Vec::new();
-            let mut sack2_letters: Vec<char> = Vec::new();
-            let mut sack3_letters: Vec<char> = Vec::new();
-
+            current_sacks.clear();
+            sack1_letters.clear();
+            sack2_letters.clear();
+            sack3_letters.clear();
         }
-        
-        current_sacks.push(sacks[x].clone());
-        j += 1;
+
+        if x == sacks.len() {
+            break;
+        }
+        else {
+            current_sacks.push(sacks[x].clone());
+        }
     }
     return total;
 }
 
 fn main() {
-    //let priorities: &mut Vec<i32> = &mut Vec::new();
+  // Creates the character to value mapping
     let value_table: &mut HashMap<char, String> = &mut HashMap::new();
     setup_value_table(value_table);
+    
     let mut total = 0;
     let sacks: &mut Vec<String> = &mut Vec::new();
     
@@ -108,5 +118,5 @@ fn main() {
         }
     }
     println!("Part 1 Answer: {}", total);
-    println!("Part 1 Answer: {}", part2(sacks, value_table));
+    println!("Part 2 Answer: {}", part2(sacks, value_table));
 }
