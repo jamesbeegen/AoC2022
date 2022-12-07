@@ -107,7 +107,7 @@ fn main() {
     let mut total = 0;
     let sacks: &mut Vec<String> = &mut Vec::new();
     
-    if let Ok(lines) = read_lines("input.txt") {
+    if let Ok(lines) = read_lines("src/input.txt") {
         for line in lines {
             if let Ok(line) = line{
                 let l: String = line;
