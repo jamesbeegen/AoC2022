@@ -1,22 +1,22 @@
 #![allow(dead_code)]
-//use core::asserting::Printable;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-// Read lines from puzzle input file
+// Read lines from puzzle input file. 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
 
+// Creates a Vec from the lines from puzzle input file
 fn read_input_file() -> Vec<String> {
     let mut vec: Vec<String> = Vec::new();
-    if let Ok(lines) = read_lines("input.txt") {
+    if let Ok(lines) = read_lines("src/input.txt") {
         for line in lines {
             if let Ok(line) = line{
-                let mut l: String = line;
+                let l: String = line;
                 vec.push(l);
             }
         }
@@ -24,19 +24,18 @@ fn read_input_file() -> Vec<String> {
     return vec;
 }
 
-fn find_large_diff(ranges: &Vec<Vec<&str>>) -> (usize, usize) {
+// Returns the index of the assignment with the (smallest, largest) range
+fn find_large_diff(ranges: &Vec<Vec<i32>>) -> (usize, usize) {
     let mut diffs: Vec<i32> = Vec::new();
-    let mut small_bound = 0;
-    let mut large_bound = 0;
     for range in ranges {
         if range[0] > range[1] {
-            small_bound = range[1].parse::<i32>().unwrap();
-            large_bound = range[0].parse::<i32>().unwrap();
+            let small_bound = range[1];
+            let large_bound = range[0];
             diffs.push(large_bound - small_bound);
         }
         else if range[0] < range[1] {
-            small_bound = range[0].parse::<i32>().unwrap();
-            large_bound = range[1].parse::<i32>().unwrap();
+            let small_bound = range[0];
+            let large_bound = range[1];
             diffs.push(large_bound - small_bound);
         }
         else{
@@ -49,36 +48,78 @@ fn find_large_diff(ranges: &Vec<Vec<&str>>) -> (usize, usize) {
     return (1, 0);
 }
 
-fn check_overlap(line: String) -> bool {    
+// Part 1
+fn check_overlap(line: String, part2: bool) -> bool {    
     // Split each line by comma, and then dash
-    let mut ranges: Vec<Vec<&str>> = Vec::new();
-    let mut split_by_comma: Vec<&str> = line.split(",").collect();
+    let mut ranges: Vec<Vec<i32>> = Vec::new();
+    let split_by_comma: Vec<&str> = line.split(",").collect();
     for range in &split_by_comma {
-        let mut split_by_dash: Vec<&str> = range.split("-").collect();
+        let temp_vec: Vec<&str> = range.split("-").collect();
+        let mut split_by_dash: Vec<i32> = Vec::new();
+        for boundary in temp_vec {
+            split_by_dash.push(boundary.parse::<i32>().unwrap());
+        }
         ranges.push(split_by_dash.clone());
     }
-    let mut diffs = find_large_diff(&ranges);
-    if ranges[diffs.1][0] >= ranges[diffs.0][0] && ranges[diffs.1][1] <= ranges[diffs.0][1] || ranges[diffs.0][0] >= ranges[diffs.1][0] && ranges[diffs.0][1] >= ranges[diffs.1][1] {
+
+    // Actual check for overlaps
+    let diffs = find_large_diff(&ranges);
+    let mut overlaps = 0;
+    for check_num in ranges[0][0]..ranges[0][1] + 1 {
+        if check_num >= ranges[1][0] && check_num <= ranges[1][1] {
+            overlaps += 1
+        }
+    }
+    if part2 {
+        if overlaps >= 1 {
+            return true;
+        }
+    }
+    else if overlaps > (ranges[diffs.1][1] - ranges[diffs.1][0]) {
         return true;
     }
-    
-    //println!("{}\n{}\n----------------------", split_by_comma[0], split_by_comma[1]);
+
+    overlaps = 0;
+    for check_num in ranges[1][0]..ranges[1][1] + 1{
+        if check_num >= ranges[0][0] && check_num <= ranges[0][1] {
+            overlaps += 1
+        }
+    }
+    if part2 {
+        if overlaps >= 1 {
+            return true;
+        }
+    }
+    if overlaps > (ranges[diffs.1][1] - ranges[diffs.1][0]) {
+        return true;
+    }
     return false;
 }
 
-fn part1() -> i32 {
-    let lines = read_input_file();
-    let mut overlap_pairs = 0;
+// Part 1
+fn part1(lines: Vec<String>) -> i32 {
+    let mut part1_overlap_pairs = 0;
 
     for x in 0..lines.len() {
-        if check_overlap(lines[x].clone()){
-            overlap_pairs += 1;
+        if check_overlap(lines[x].clone(), false){
+            part1_overlap_pairs += 1;
         }
     }
-    return overlap_pairs;
+    return part1_overlap_pairs;
+}
+    
+fn part2(lines: Vec<String>) -> i32 {
+    let mut part2_overlap_pairs = 0;
+    for x in 0..lines.len() {
+        if check_overlap(lines[x].clone(), true){
+            part2_overlap_pairs += 1;
+        }
+    }
+    return part2_overlap_pairs;
 }
 
 fn main() {
-    println!("Part 1 Answer: {}", part1());
-    //println!("Part 2 Answer: {}", part2_answer);
+    let lines = read_input_file();
+    println!("Part 1 Answer: {}", part1(lines.clone()));
+    println!("Part 2 Answer: {}", part2(lines.clone()));
 }
