@@ -77,14 +77,15 @@ fn part2(lines: Vec<String>) -> i32{
         chars_list.push(char);
     }
 
-    // Select four letter slice, check it for dupes
+    // Select fourteen letter slice, check it for dupes
     for x in 0..chars_list.len() - 14 {
         let mut fourteen_chars: Vec<char> = Vec::new();
         let part2 = true;
-        //vec!(chars_list[x], chars_list[x+1], chars_list[x+2], chars_list[x+3]);
+        
         for i in x..x+14 {
             fourteen_chars.push(chars_list[i]);
         }
+        
         if has_unique_letters(fourteen_chars, part2){
             break;
         }
