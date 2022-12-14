@@ -1,4 +1,4 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_labels)]
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -30,7 +30,7 @@ fn get_initial_stacks(lines: Vec<String>) -> Vec<Vec<char>> {
     let mut stacks: Vec<Vec<char>> = Vec::new();
 
     // Creates a vector/list for each stack
-    for x in 0..num_stacks {
+    for _x in 0..num_stacks {
         let stack: Vec<char> = Vec::new();
         stacks.push(stack);
     }
@@ -57,7 +57,7 @@ fn get_initial_stacks(lines: Vec<String>) -> Vec<Vec<char>> {
 }
 
 // Parses input file for instructions on moving items, then performs those instructions
-fn move_stacks(mut stacks: Vec<Vec<char>>, lines: Vec<String>) -> Vec<Vec<char>> {
+fn move_stacks(mut stacks: Vec<Vec<char>>, lines: Vec<String>, part2: bool) -> Vec<Vec<char>> {
     let mut instructions: Vec<Vec<&str>> = Vec::new();
     '_outer: for line in &lines {
         let chars = line.chars();
@@ -73,11 +73,24 @@ fn move_stacks(mut stacks: Vec<Vec<char>>, lines: Vec<String>) -> Vec<Vec<char>>
         let move_from = instruction[3].parse::<usize>().unwrap() - 1;
         let move_to = instruction[5].parse::<usize>().unwrap() - 1;
 
-        for x in 0..num_to_move {
+        '_outer: for _x in 0..num_to_move {
             let stack_length = stacks[move_from].len();
-            let item_to_move = stacks[move_from][stack_length-1];
-            stacks[move_to].push(item_to_move);
-            stacks[move_from].pop();
+            if part2 {
+                let lower_bound = stack_length - num_to_move;
+                'inner: for x in lower_bound..stack_length {
+                    let item_to_move = stacks[move_from][x];
+                    stacks[move_to].push(item_to_move);
+                }
+                for _x in lower_bound..stack_length {
+                    stacks[move_from].remove(lower_bound);
+                }
+                break '_outer;
+            }
+            else {
+                let item_to_move = stacks[move_from][stack_length-1];
+                stacks[move_to].push(item_to_move);
+                stacks[move_from].pop();
+            }
         }
     }
     return stacks;
@@ -85,9 +98,10 @@ fn move_stacks(mut stacks: Vec<Vec<char>>, lines: Vec<String>) -> Vec<Vec<char>>
 
 // Part 1
 fn part1(lines: Vec<String>) -> String {
+    let part2 = false;
     let stacks = get_initial_stacks(lines.clone());
     let mut answer = String::from("");
-    let moved_stacks = move_stacks(stacks.clone(), lines.clone());
+    let moved_stacks = move_stacks(stacks.clone(), lines.clone(), part2);
     for stack in moved_stacks {
         answer.push(stack[stack.len() - 1]);
     }
@@ -95,8 +109,15 @@ fn part1(lines: Vec<String>) -> String {
 }
 
 // Part 2
-fn part2(lines: Vec<String>) -> i32 {
-    return 0;
+fn part2(lines: Vec<String>) -> String {
+    let part2 = true;
+    let stacks = get_initial_stacks(lines.clone());
+    let mut answer = String::from("");
+    let moved_stacks = move_stacks(stacks.clone(), lines.clone(), part2);
+    for stack in moved_stacks {
+        answer.push(stack[stack.len() - 1]);
+    }
+    return answer
 }
 
 fn main() {
